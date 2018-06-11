@@ -91,6 +91,12 @@ public class ManualTransactionManager
     }
 
     @Override
+    public void registerTransactionSynchronization(TransactionSynchronization ts, boolean interposed) {
+        registerTransactionSynchronization(ts);
+    }
+
+
+    @Override
     public void putResource(Object key, Object resource) {
         transactionResources.get().put(key, resource);
     }
