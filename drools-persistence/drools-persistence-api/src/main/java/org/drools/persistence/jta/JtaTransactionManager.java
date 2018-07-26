@@ -300,8 +300,8 @@ public class JtaTransactionManager
         }
     }
 
-    public void registerTransactionSynchronization(final TransactionSynchronization ts, boolean interposed) {
-        if ( this.tsr != null && interposed ) {
+    public void registerTransactionSynchronization(final TransactionSynchronization ts) {
+        if ( this.tsr != null ) {
             TransactionSynchronizationRegistryHelper.registerTransactionSynchronization( this.tsr,
                                                                                          ts );
         } else if ( this.tm != null ) {
@@ -317,10 +317,6 @@ public class JtaTransactionManager
             // No JTA TransactionManager available - log a warning.
             logger.warn( "Participating in existing JTA transaction, but no JTA TransactionManager or TransactionSychronizationRegistry available: " );
         }
-    }
-
-    public void registerTransactionSynchronization(final TransactionSynchronization ts) {
-        registerTransactionSynchronization(ts, true);
     }
 
     @Override
