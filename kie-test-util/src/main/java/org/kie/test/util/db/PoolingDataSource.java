@@ -42,6 +42,7 @@ import com.arjuna.ats.jta.common.jtaPropertyManager;
 import com.arjuna.ats.jta.recovery.XAResourceRecoveryHelper;
 import org.apache.tomcat.dbcp.dbcp2.PoolableConnection;
 import org.apache.tomcat.dbcp.dbcp2.PoolableConnectionFactory;
+import org.apache.tomcat.dbcp.dbcp2.Utils;
 import org.apache.tomcat.dbcp.dbcp2.managed.DataSourceXAConnectionFactory;
 import org.apache.tomcat.dbcp.dbcp2.managed.ManagedDataSource;
 import org.apache.tomcat.dbcp.pool2.impl.AbandonedConfig;
@@ -96,7 +97,7 @@ public class PoolingDataSource implements DataSource {
                 jtaPropertyManager.getJTAEnvironmentBean().getTransactionSynchronizationRegistry();
 
 
-        final DataSourceXAConnectionFactory xaConnectionFactory = resolveDataSourceXAConnectionFactory(tm, xaDataSource);
+        final DataSourceXAConnectionFactory xaConnectionFactory = resolveDataSourceXAConnectionFactory(tm, xaDataSource, tsr);
         managedDataSource = createManagedDataSource(xaConnectionFactory, xaDataSource, environment);
 
         try {
@@ -112,14 +113,15 @@ public class PoolingDataSource implements DataSource {
     }
 
     private DataSourceXAConnectionFactory resolveDataSourceXAConnectionFactory(final TransactionManager tm,
-                                                                               final XADataSource xaDataSource) {
+                                                                               final XADataSource xaDataSource,
+                                                                               final TransactionSynchronizationRegistry tsr) {
         final DataSourceXAConnectionFactory xaConnectionFactory;
         if (isH2()) {
-            xaConnectionFactory = new DataSourceXAConnectionFactory(tm, xaDataSource);
+            xaConnectionFactory = new DataSourceXAConnectionFactory(tm, xaDataSource, tsr);
         } else {
             final String username = driverProperties.getProperty("user");
             final String password = driverProperties.getProperty("password");
-            xaConnectionFactory = new DataSourceXAConnectionFactory(tm, xaDataSource, username, password);
+            xaConnectionFactory = new DataSourceXAConnectionFactory(tm, xaDataSource, username, Utils.toCharArray(password), tsr);
         }
 
         return xaConnectionFactory;
